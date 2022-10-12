@@ -40,9 +40,9 @@ index 4b2c429..1fb4c52 100644
      word total_size = 0;
 +    size_t stack_limit;
 +    pthread_attr_t pattr;
- 
-     if (!EXPECT(GC_thr_initialized, TRUE))
-       GC_thr_init();
+ #   ifdef E2K
+       GC_bool is_stopped = (GC_bool)GC_world_is_stopped;
+ #   endif
 @@ -722,6 +724,31 @@ GC_INNER void GC_push_all_stacks(void)
            hi = p->altstack + p->altstack_size;
            /* FIXME: Need to scan the normal stack too, but how ? */
