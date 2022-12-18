@@ -270,6 +270,7 @@ void NixRepl::mainLoop()
             // ctrl-D should exit the debugger.
             state->debugStop = false;
             state->debugQuit = true;
+            logger->cout("");
             break;
         }
         try {
@@ -384,6 +385,10 @@ StringSet NixRepl::completePrefix(const std::string & prefix)
             i++;
         }
     } else {
+        /* Temporarily disable the debugger, to avoid re-entering readline. */
+        auto debug_repl = state->debugRepl;
+        state->debugRepl = nullptr;
+        Finally restoreDebug([&]() { state->debugRepl = debug_repl; });
         try {
             /* This is an expression that should evaluate to an
                attribute set.  Evaluate it to get the names of the
@@ -782,7 +787,7 @@ void NixRepl::loadFlake(const std::string & flakeRefS)
             flake::LockFlags {
                 .updateLockFile = false,
                 .useRegistries = !evalSettings.pureEval,
-                .allowMutable  = !evalSettings.pureEval,
+                .allowUnlocked = !evalSettings.pureEval,
             }),
         v);
     addAttrsToScope(v);
@@ -1050,7 +1055,7 @@ struct CmdRepl : InstallablesCommand
         evalSettings.pureEval = false;
     }
 
-    void prepare()
+    void prepare() override
     {
         if (!settings.isExperimentalFeatureEnabled(Xp::ReplFlake) && !(file) && this->_installables.size() >= 1) {
             warn("future versions of Nix will require using `--file` to load a file");

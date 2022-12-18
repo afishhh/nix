@@ -58,7 +58,7 @@ readonly EXTRACTED_NIX_PATH="$(dirname "$0")"
 
 readonly ROOT_HOME=~root
 
-if [ -t 0 ]; then
+if [ -t 0 ] && [ -z "${NIX_INSTALLER_YES:-}" ]; then
     readonly IS_HEADLESS='no'
 else
     readonly IS_HEADLESS='yes'
@@ -97,13 +97,10 @@ is_os_darwin() {
 }
 
 contact_us() {
-    echo "You can open an issue at https://github.com/nixos/nix/issues"
+    echo "You can open an issue at"
+    echo "https://github.com/NixOS/nix/issues/new?labels=installer&template=installer.md"
     echo ""
-    echo "Or feel free to contact the team:"
-    echo " - Matrix: #nix:nixos.org"
-    echo " - IRC: in #nixos on irc.libera.chat"
-    echo " - twitter: @nixos_org"
-    echo " - forum: https://discourse.nixos.org"
+    echo "Or get in touch with the community: https://nixos.org/community"
 }
 get_help() {
     echo "We'd love to help if you need it."
